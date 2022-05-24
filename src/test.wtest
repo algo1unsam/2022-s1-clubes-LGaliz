@@ -1,0 +1,254 @@
+import club.*
+
+describe "Club Tradicional, bellota, bombon y burbuja son jugadoras, y el profesor es un socio comun."{
+
+	const bellota = new Jugador(pase = 1000000)
+	const bombon = new Jugador(pase = 1000, partidos = 100)
+	const burbuja = new Jugador(pase = 1000, partidos = 10)
+	const profesor = new Socio(antiguedad=10)
+	
+	const futbol = new Futbol (integrantes =#{bellota,burbuja}, destacado = bellota)
+	const basquet = new Equipo (integrantes =#{bellota, bombon,burbuja}, destacado = burbuja)
+	const pasta = new ActividadSocial (integrantes =#{profesor,burbuja}, destacado = profesor)
+	
+	const unClubTradicional = new Tradicional(gastoMensual = 9990 , socios=#{bellota, bombon, burbuja, profesor}, actividades=#{futbol, basquet, pasta})
+	
+	method initialize(){
+	municipio.addClub(unClubTradicional)	
+	}
+
+	test "Todos los socios de un club" {
+		assert.equals(#{bellota, bombon, burbuja, profesor}, unClubTradicional.socios())
+	}
+	
+	test "Todos los jugadores de un equipo" {
+		assert.equals(#{bellota, burbuja}, futbol.integrantes())
+		assert.equals(#{profesor, burbuja}, pasta.integrantes())
+	}
+	
+	test "El profesor es el mas antiguo" {
+		assert.equals(profesor, unClubTradicional.socioMasAntiguo())	
+	}
+	test "Los socios destacados" {
+		assert.equals(#{bellota, burbuja, profesor}, unClubTradicional.sociosDestacados().asSet())
+	}
+	//ESTRELLAS
+	test "Estrellas Tradicional"  {
+		assert.that(bellota.esEstrella())
+		assert.that(bombon.esEstrella())
+		assert.that(burbuja.esEstrella())
+		assert.notThat(profesor.esEstrella())
+	}
+}
+
+describe "En un club profesional, bellota, bombon y burbuja son jugadoras, y el profesor es un socio comun."{
+
+	const bellota = new Jugador(pase = 1000000)
+	const bombon = new Jugador(pase = 1000, partidos = 100)
+	const burbuja = new Jugador(pase = 1000, partidos = 10)
+	const profesor = new Socio(antiguedad=10)
+	
+	const futbol = new Futbol (integrantes =#{bellota,burbuja}, destacado = bellota)
+	const basquet = new Equipo (integrantes =#{bellota, bombon,burbuja}, destacado = burbuja)
+	const pasta = new ActividadSocial (integrantes =#{profesor,burbuja}, destacado = profesor)
+	
+	const unClubProfesional = new Profesional(gastoMensual = 9990 , socios=#{bellota, bombon, burbuja, profesor}, actividades=#{futbol, basquet, pasta})
+	
+	method initialize(){
+	municipio.addClub(unClubProfesional)	
+	}
+	//ESTRELLAS
+	test "Estrellas Profesional"  {
+		assert.that(bellota.esEstrella())
+		assert.that(bombon.esEstrella())
+		assert.notThat(burbuja.esEstrella())
+		assert.notThat(profesor.esEstrella())
+	}	
+}
+
+describe "En un club comunitario, bellota, bombon y burbuja son jugadoras, y el profesor es un socio comun."{
+
+	const bellota = new Jugador(pase = 1000000)
+	const bombon = new Jugador(pase = 1000, partidos = 100)
+	const burbuja = new Jugador(pase = 1000, partidos = 10)
+	const profesor = new Socio(antiguedad=10)
+	const oliverAtom =  new Jugador(pase = 1000, partidos = 100)
+	const tom=  new Jugador(pase = 1000, partidos = 100)
+	
+	const niupi = new Futbol (integrantes =#{oliverAtom,tom}, destacado = oliverAtom)
+	const futbol = new Futbol (integrantes =#{bellota,burbuja}, destacado = bellota)
+	const basquet = new Equipo (integrantes =#{bellota, bombon,burbuja}, destacado = burbuja)
+	const pasta = new ActividadSocial (integrantes =#{profesor,burbuja}, destacado = profesor)
+	const tango = new ActividadSocial (integrantes =#{profesor,burbuja}, destacado = profesor, valor = 100)
+	
+	const unClubTradicional = new Tradicional(gastoMensual = 9990 , socios=#{bellota, bombon, burbuja, profesor}, actividades=#{futbol, basquet, pasta})
+	const unClubProfesional = new Profesional(socios=#{bellota, bombon, burbuja, profesor}, actividades=#{futbol, basquet, pasta})
+	const unClubComunitario = new Comunitario(socios=#{bellota, bombon, burbuja, profesor}, actividades=#{futbol, basquet, pasta})
+	const niupiClub = new Profesional(socios=#{oliverAtom, tom}, actividades=#{niupi,tango})
+	
+	method initialize(){
+	municipio.addClub(unClubTradicional)	
+	municipio.addClub(unClubProfesional)	
+	municipio.addClub(unClubComunitario)	
+	municipio.sancionar(unClubComunitario)
+	pasta.sancionar()
+	futbol.sancionar()	
+	tango.sancionar()
+	tango.reanudar()
+	}
+	
+
+	test "cantidad de actividades"{
+		assert.that(basquet.participa(burbuja))
+		assert.that(futbol.participa(burbuja))
+		assert.that(pasta.participa(burbuja))
+		assert.equals(3, unClubTradicional.cantidadActividades(burbuja))
+	}
+
+	 test "Estrellas Comunitario"  {
+		assert.that(bombon.esEstrella())
+		assert.that(burbuja.esEstrella())
+		assert.notThat(bellota.esEstrella())
+		assert.notThat(profesor.esEstrella())
+	}
+	
+}
+
+describe "Sanciones"{
+
+	const bellota = new Jugador(pase = 1000000)
+	const bombon = new Jugador(pase = 1000, partidos = 100)
+	const burbuja = new Jugador(pase = 1000, partidos = 10)
+	const profesor = new Socio(antiguedad=10)
+	
+	const futbol = new Futbol (integrantes =#{bellota,burbuja}, destacado = bellota)
+	const basquet = new Equipo (integrantes =#{bellota, bombon,burbuja}, destacado = burbuja)
+	const pasta = new ActividadSocial (integrantes =#{profesor,burbuja}, destacado = profesor)
+	const tango = new ActividadSocial (integrantes =#{profesor,burbuja}, destacado = profesor, valor = 100)
+	
+	const unClubComunitario = new Comunitario(socios=#{bellota, bombon, burbuja, profesor}, actividades=#{futbol, basquet, pasta})
+	
+	method initialize(){
+
+	municipio.sancionar(unClubComunitario)
+	pasta.sancionar()
+	futbol.sancionar()	
+	tango.sancionar()
+	tango.reanudar()
+	}
+	
+	  test "sancionar actividad"  {
+		assert.that(pasta.suspendida())
+		assert.equals(1, futbol.cantidadSanciones())
+		assert.notThat(tango.suspendida())
+	}
+}
+
+describe "Evaluaciones."{
+
+	const bellota = new Jugador(pase = 1000000)
+	const bombon = new Jugador(pase = 1000, partidos = 100)
+	const burbuja = new Jugador(pase = 1000, partidos = 10)
+	const profesor = new Socio(antiguedad=10)
+	const oliverAtom =  new Jugador(pase = 1000, partidos = 100)
+	const tom=  new Jugador(pase = 1000, partidos = 100)
+	
+	const niupi = new Futbol (integrantes =#{oliverAtom,tom}, destacado = oliverAtom)
+	const futbol = new Futbol (integrantes =#{bellota,burbuja}, destacado = bellota)
+	const basquet = new Equipo (integrantes =#{bellota, bombon,burbuja}, destacado = burbuja)
+	const pasta = new ActividadSocial (integrantes =#{profesor,burbuja}, destacado = profesor)
+	const tango = new ActividadSocial (integrantes =#{profesor,burbuja}, destacado = profesor, valor = 100)
+	
+	const unClubTradicional = new Tradicional(gastoMensual = 9990 , socios=#{bellota, bombon, burbuja, profesor}, actividades=#{futbol, basquet, pasta})
+	const unClubProfesional = new Profesional(socios=#{bellota, bombon, burbuja, profesor}, actividades=#{futbol, basquet, pasta})
+	const unClubComunitario = new Comunitario(socios=#{bellota, bombon, burbuja, profesor}, actividades=#{futbol, basquet, pasta})
+	const niupiClub = new Profesional(socios=#{oliverAtom, tom}, actividades=#{niupi,tango})
+	
+	method initialize(){
+	municipio.addClub(unClubTradicional)	
+	municipio.addClub(unClubProfesional)	
+	municipio.addClub(unClubComunitario)	
+	municipio.sancionar(unClubComunitario)
+	pasta.sancionar()
+	futbol.sancionar()	
+	tango.sancionar()
+	tango.reanudar()
+	}
+	
+	  test "evaluacion equipo basquet"  {
+		assert.equals(11 , basquet.evaluar())
+	}
+	  test "evaluacion equipo futbol"  {
+		assert.equals(-21 , futbol.evaluar())
+	}
+	  test "evaluacion actividad social suspendida"  {
+		assert.equals(0 , pasta.evaluar())
+	}
+	  test "evaluacion actividad social"  {
+		assert.equals(100 , tango.evaluar())
+	}
+	  test "Evaluacion club Tradicional"  {
+		assert.equals(-2500 , unClubTradicional.evaluar())
+	}
+	  test "Evaluacion club Profesional"  {
+		assert.equals(-5 , unClubProfesional.evaluar())
+	}
+	  test "Evaluacion club Comunitario"  {
+		assert.equals(-2.5 , unClubComunitario.evaluar())
+	}
+	  test "Equipo no experimentado"  {
+		assert.notThat(futbol.experimentado())
+	}
+	  test "Equipo experimentado"  {
+		assert.that(niupi.experimentado())
+	}
+	  test "Club prestigioso"  {
+		assert.that(niupiClub.esPrestigioso())
+	}
+}
+
+describe "Transferencias"{
+	
+	const oliverAtom =  new Jugador(pase = 1000, partidos = 100)
+	const tom=  new Jugador(pase = 1000, partidos = 100)
+	const bellota = new Jugador(pase = 1000000, partidos = 1)
+	const bombon = new Jugador(pase = 1000, partidos = 100)
+	const burbuja = new Jugador(pase = 1000, partidos = 10)
+	
+	const superPowerGirls = new Futbol (integrantes =#{bellota,burbuja, bombon}, destacado = burbuja)
+	const niupi = new Futbol (integrantes =#{oliverAtom,tom}, destacado = oliverAtom)
+	const basquet = new Equipo (integrantes =#{bellota, bombon,burbuja}, destacado = burbuja)
+	const tango = new ActividadSocial (integrantes =#{bellota, burbuja }, destacado = burbuja)
+	
+	const unClubComunitario = new Comunitario(socios=#{bellota, bombon, burbuja}, actividades=#{superPowerGirls, basquet, tango})
+	const niupiClub = new Profesional(socios=#{oliverAtom, tom}, actividades=#{niupi})
+	
+	method initialize(){
+	municipio.addClub(unClubComunitario)	
+	municipio.addClub(niupiClub)
+	municipio.tranferir(burbuja, superPowerGirls, niupi)
+	municipio.tranferir(bombon, superPowerGirls, basquet)
+	municipio.tranferir(bellota, superPowerGirls, niupi)
+	}
+	test "Un jugador que es socio destacado no puede ser transferido."  {
+		assert.that(superPowerGirls.integrantes().contains(burbuja))
+	}
+	test "No se puede transferir entre equipos del mismo club"  {
+		assert.that(superPowerGirls.integrantes().contains(bombon))
+	}
+	test "Se debe remover el jugador de todos los equipos y actividades del club origen"  {
+		assert.notThat(superPowerGirls.integrantes().contains(bellota))
+		assert.notThat(basquet.integrantes().contains(bellota))
+		assert.notThat(tango.integrantes().contains(bellota))
+	}
+	test "Se debe agregar el jugador al equipo destino."  {
+		assert.that(niupi.integrantes().contains(bellota))
+	}
+	test "La transferencia afecta a la cantidad de socios de ambos clubes (El club del equipo origen tiene un socio menos y el club del equipo destino tiene un socio más)"  {
+		assert.equals(2, unClubComunitario.socios().size())
+		assert.equals(3, niupiClub.socios().size())
+	}
+	test "La cantidad de partidos jugados del jugador se resetea."  {
+		assert.equals(0, bellota.partidos())
+	}
+}
