@@ -8,29 +8,8 @@ object municipio{
 
 	method sancionar(club) { if(club.sancionable())  club.actividades().forEach({actividad => actividad.sancionar() })}
 
-	method tranferir(jugador,equipoOrigen, equipoDestino) { 
-		if(not self.esDestacado(jugador, equipoOrigen) and not self.equiposMismoClub(equipoOrigen, equipoDestino)){
-			self.removerDeActividadesYEquiposA(jugador, equipoOrigen)
-			self.agregar(jugador, equipoDestino)
-			self.quitarSocioClub(jugador, equipoOrigen)
-			self.agregarSocioClub(jugador, equipoDestino)
-			jugador.partidos(0)
-		}
-	}
+
 	
-	method equiposMismoClub(equipoOrigen, equipoDestino) = clubes.any({club => club.tieneEste(equipoOrigen) and club.tieneEste(equipoDestino)})
-	
-	method removerDeActividadesYEquiposA(jugador, equipoOrigen) { self.clubPor(equipoOrigen).removerDetodasLasActividades(jugador)}
-	
-	method clubPor(equipo) = clubes.find({club => club.actividades().contains(equipo)})
-	
-	method agregar(jugador, equipoDestino) { equipoDestino.integrantes(jugador)	}
-	
-	method quitarSocioClub(jugador, equipoOrigen) { self.clubPor(equipoOrigen).remover(jugador)	}
-	
-	method agregarSocioClub(jugador, equipoDestino) { self.clubPor(equipoDestino).socios(jugador)	}
-	
-	method esDestacado(jugador, equipoOrigen) = equipoOrigen.destacado() === jugador	
 }
 
 class Club {
@@ -65,11 +44,6 @@ var property gastoMensual = 0
 	
 	method tieneEste(equipo) = actividades.contains(equipo)
 	
-	method actividadesQueParticipa(socio) = actividades.filter({actividad => actividad.participa(socio)})
-
-	method removerDetodasLasActividades(socio) {self.actividadesQueParticipa(socio).forEach({actividad => actividad.remover(socio)})}//{ self.actividadesQueParticipa(socio).forEach({actividad => actividad.remover(socio)})}
-
-	method remover(socio) { socios.remove(socio)}
 }
 
 class Tradicional inherits Club{
@@ -128,7 +102,6 @@ class Actividad{
 	
 	method prestigiosa()
 	
-	method remover(socio) { integrantes.remove(socio)}
 }
 
 class Equipo inherits Actividad {
