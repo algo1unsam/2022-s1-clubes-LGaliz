@@ -2,21 +2,46 @@ object municipio{
 	const property clubes = #{}
 	const property valorTope = 50000
 
-	method addClub(club) {	clubes.add(club)	}	
+	method addClub(club) { clubes.add(club) }	
 
 	method club(socio) = clubes.find({club => club.socios().contains(socio)})
 
-	method sancionar(club) { if(club.sancionable())  club.actividades().forEach({actividad => actividad.sancionar() })}
+	method sancionar(club) { if(club.esSancionable())  self.sancionarTodasLasActividades(club) }
 
-
+	method sancionarTodasLasActividades(club) { club.actividades().forEach({ actividad => actividad.sancionar()})	}
 	
+	method tranferir(jugador,equipoOrigen, equipoDestino) { 
+		if(not self.esDestacado(jugador, equipoOrigen) and not self.equiposMismoClub(equipoOrigen, equipoDestino)){
+			self.removerDeActividadesYEquiposA(jugador, equipoOrigen)
+			self.agregar(jugador, equipoDestino)
+			self.quitarSocioClub(jugador, equipoOrigen)
+			self.agregarSocioClub(jugador, equipoDestino)
+			self.resetPartidos(jugador) 
+		}
+	}
+	
+	method equiposMismoClub(equipoOrigen, equipoDestino) = clubes.any({club => club.tieneEste(equipoOrigen) and club.tieneEste(equipoDestino)})
+	
+	method removerDeActividadesYEquiposA(jugador, equipoOrigen) { self.clubQueTiene(equipoOrigen).removerDeTodasLasActividadesAl(jugador)}
+	
+	method clubQueTiene(equipo) = clubes.find({club => club.actividades().contains(equipo)})
+	
+	method agregar(jugador, equipoDestino) { equipoDestino.integrantes(jugador)	}
+	
+	method quitarSocioClub(jugador, equipoOrigen) { self.clubQueTiene(equipoOrigen).remover(jugador)	}
+	
+	method agregarSocioClub(jugador, equipoDestino) { self.clubQueTiene(equipoDestino).socios(jugador)	}
+	
+	method esDestacado(jugador, equipoOrigen) = self.clubQueTiene(equipoOrigen).sociosDestacados().contains(jugador)  //method esDestacado(jugador, equipoOrigen) = equipoOrigen.destacado() === jugador
+	
+	method resetPartidos(jugador) {jugador.partidos(0)}	
 }
 
 class Club {
-var property calidad = 0
-const property socios = #{}
-const property actividades = #{}
-var property gastoMensual = 0
+	var property calidad = 0
+	const property socios = #{}
+	const property actividades = #{}
+	var property gastoMensual = 0
 
 	method socios(socio){	socios.add(socio)}//if(not municipio.club(socio)) socios.add(socio)	}
    
@@ -32,9 +57,11 @@ var property gastoMensual = 0
 	
 	method cantidadActividades(jugador) = actividades.count({actividad => actividad.participa(jugador)})	
 
-	method sancionable() = self.socios().size() > 500
+	method esSancionable() = self.socios().size() > 500
 	
-	method evaluar() = self.evaluacionBruta() / socios.size()
+	method cantidadDeSocios() = socios.size()
+	
+	method evaluar() = self.evaluacionBruta() / self.cantidadDeSocios()
 	
 	method evaluacionBruta() = self.sumaEvaluacionesActividades()
 	
@@ -44,6 +71,11 @@ var property gastoMensual = 0
 	
 	method tieneEste(equipo) = actividades.contains(equipo)
 	
+	method actividadesQueParticipa(socio) = actividades.filter({actividad => actividad.participa(socio)})
+
+	method removerDeTodasLasActividadesAl(socio) {self.actividadesQueParticipa(socio).forEach({actividad => actividad.remover(socio)})}//{ self.actividadesQueParticipa(socio).forEach({actividad => actividad.remover(socio)})}
+
+	method remover(socio) { socios.remove(socio)}
 }
 
 class Tradicional inherits Club{
@@ -84,6 +116,8 @@ class Jugador inherits Socio{
 	method superaValorDePase() = pase > municipio.valorTope()
 	
 	method club() = municipio.club(self)
+	
+	method esExperimentado() = partidos >= 10
 }
 
 class Actividad{
@@ -102,6 +136,9 @@ class Actividad{
 	
 	method prestigiosa()
 	
+	method remover(socio) { integrantes.remove(socio)}
+	
+	method cantidadIntegrantesEstrellas() = integrantes.count({integrante => integrante.esEstrella()})
 }
 
 class Equipo inherits Actividad {
@@ -120,7 +157,7 @@ class Equipo inherits Actividad {
 	method puntosPorSanciones() = descuento * cantidadSanciones
 	method capitanEsEstrella() =  destacado.esEstrella()
 	
-	method experimentado() = integrantes.all({integrante => integrante.partidos() >= 10})
+	method experimentado() = integrantes.all({integrante => integrante.esExperimentado()})
 	
 	override method prestigiosa() = self.experimentado()
 }
@@ -129,9 +166,9 @@ class Futbol inherits Equipo {
 	
 	override method descuento() = 30
 		
-	override method evaluar() = super() + 5 * self.cantidadDeEstrellasEquipo() - (10 * cantidadSanciones)  //.max(0)
+	override method evaluar() = super() + 5 * self.cantidadIntegrantesEstrellas() - (10 * cantidadSanciones)  //.max(0) Si no queremos numeros negativos
 	
-	method cantidadDeEstrellasEquipo() = integrantes.count({ jugador => jugador.esEstrella()})
+	//method cantidadDeEstrellasEquipo() = integrantes.count({ jugador => jugador.esEstrella()})
 }
 
 class ActividadSocial inherits Actividad{
@@ -145,9 +182,9 @@ class ActividadSocial inherits Actividad{
 	
 	override method evaluar() = if(suspendida) 0 else valor
 	
-	override method prestigiosa() = self.muchosParticipantesEstrellas()
+	override method prestigiosa() = self.cantidadIntegrantesEstrellas() >= 5
 
-	method muchosParticipantesEstrellas() = integrantes.count({integrante => integrante.esEstrella()}) >= 5
+	//method muchosParticipantesEstrellas() = integrantes.count({integrante => integrante.esEstrella()}) >= 5
 }
 
 
