@@ -1,30 +1,34 @@
-// import club.*
+import club2.*
 
-// describe "Club Tradicional, bellota, bombon y burbuja son jugadoras, y el profesor es un socio comun."{
 
-// 	const bellota = new Jugador(pase = 1000000)
-// 	const bombon = new Jugador(pase = 1000, partidos = 100)
-// 	const burbuja = new Jugador(pase = 1000, partidos = 10)
-// 	const profesor = new Socio(antiguedad=10)
-	
-// 	const futbol = new Futbol (integrantes =#{bellota,burbuja}, destacado = bellota)
-// 	const basquet = new Equipo (integrantes =#{bellota, bombon,burbuja}, destacado = burbuja)
-// 	const pasta = new ActividadSocial (integrantes =#{profesor,burbuja}, destacado = profesor)
-	
-// 	const unClubTradicional = new Tradicional(gastoMensual = 9990 , socios=#{bellota, bombon, burbuja, profesor}, actividades=#{futbol, basquet, pasta})
-	
-// 	method initialize(){
-// 	municipio.addClub(unClubTradicional)	
-// 	}
+describe "Club Tradicional, bellota, bombon y burbuja son jugadoras, y el profesor es un socio comun."{
 
-// 	test "Todos los socios de un club" {
-// 		assert.equals(#{bellota, bombon, burbuja, profesor}, unClubTradicional.socios())
-// 	}
+	const bellota = new Jugador(pase = 1000000)
+	const bombon = new Jugador(pase = 1000, partidos = 100)
+	const burbuja = new Jugador(pase = 1000, partidos = 10)
+	const profesor = new Socio(antiguedad=10)
+	const basquet = new Equipo(integrantes =#{bellota,burbuja}, capitan = bellota)
+	const pasta = new Social (integrantes =#{profesor,burbuja}, socioFundador = profesor)
+	const unClub = new Club( actividades=#{basquet, pasta})
 	
-// 	test "Todos los jugadores de un equipo" {
-// 		assert.equals(#{bellota, burbuja}, futbol.integrantes())
-// 		assert.equals(#{profesor, burbuja}, pasta.integrantes())
-// 	}
+	//const futbol = new Futbol (integrantes =#{bellota,burbuja}, destacado = bellota)
+
+	//const basquet = new Equipo (integrantes =#{bellota, bombon,burbuja})//, destacado = burbuja)
+	
+	//const unClubTradicional = new Tradicional(gastoMensual = 9990 , socios=#{bellota, bombon, burbuja, profesor}, actividades=#{futbol, basquet, pasta})
+	
+	method initialize(){
+	//municipio.addClub(unClubTradicional)	
+	}
+
+	test "Todos los socios de un club" {
+		assert.equals(#{bellota, bombon, burbuja, profesor}, unClub.socios())
+	}
+	
+	// test "Todos los jugadores de un equipo" {
+	// //	assert.equals(#{bellota, burbuja}, futbol.integrantes())
+	// //	assert.equals(#{profesor, burbuja}, pasta.integrantes())
+	// }
 	
 // 	test "El profesor es el mas antiguo" {
 // 		assert.equals(profesor, unClubTradicional.socioMasAntiguo())	
@@ -232,4 +236,4 @@
 // 	test "La cantidad de partidos jugados del jugador se resetea."  {
 // 		assert.equals(0, bellota.partidos())
 // 	}
-// }
+ }

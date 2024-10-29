@@ -1,30 +1,48 @@
+object municipio{
+    const clubs = []
+   // method todosLosSocios() = 
+}
+
+
 class Club {
     var calidad = 0
-    const actividades = []
+    const property actividades = []
+    var gastoMensual = 0
+    const property socios = #{}
+
+    method socios() = actividades.sum({actividad => actividad.todosLosMiembros()})
 
 }
 
 class Actividad {
 
     method evaluacion(){}
+    method todosLosMiembros()
   
 }
-class Social {
-   const socios = []
+class Social inherits Actividad{
+   const property integrantes = #{}
    var socioFundador
+
+   override method todosLosMiembros() = integrantes
+
 }
 
-class Equipo {
-   const plantel = []
+class Equipo inherits Actividad{
+   const property integrantes = #{}
    var capitan
+
+   override method todosLosMiembros() = integrantes
 }
 
 class Jugador {
-    var valorPase =0
+    var pase =0
+    var partidos =0
+
 }
 
 class Socio {
-    var anios =0
+    var antiguedad =0
 }
 
 
